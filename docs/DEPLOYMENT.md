@@ -206,6 +206,8 @@ RENDER_DEPLOY_HOOK_URL=<Render Deploy Hook URL>
 
 之后 `.github/workflows/render-deploy.yml` 会在 `Build Docker Image` 工作流成功后自动请求该 Hook，让 Render 重新拉取 `ghcr.io/james-6-23/codex2api:latest` 并部署。
 
+`master` 分支每次推送都会触发 `Build Docker Image`，重建镜像并覆盖 `latest` 标签。
+
 也可以手动触发镜像构建工作流，镜像推送成功后会自动进入 Render 部署工作流：
 
 ```bash
