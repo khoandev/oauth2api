@@ -439,6 +439,8 @@ export interface AccountRow {
   subscription_expires_at?: string
   /** 服务端按业务时区计算的订阅状态对象;不跟踪订阅的套餐(api/无到期时间的 free)缺省。 */
   subscription?: SubscriptionStatus
+  /** Auto-pause window resolved by the scheduler, including inherited thresholds. */
+  quota_pause_window?: '5h' | '7d' | ''
   status: AccountStatus
   error_message?: string
   at_only?: boolean
@@ -705,6 +707,7 @@ export interface AccountLiveStateResponse {
     dynamic_concurrency_limit?: number
     base_concurrency_effective?: number
     // 运行时用量投影：旧后端缺 key 时保留列表值；显式 null 表示窗口已失效。
+    quota_pause_window?: '5h' | '7d' | ''
     status?: AccountStatus
     using_credits?: boolean
     plan_type?: string
@@ -1089,6 +1092,7 @@ export interface AddAccountRequest {
   refresh_token?: string
   session_token?: string
   proxy_url: string
+  timezone?: string
   allow_duplicate?: boolean
   custom_headers?: Record<string, string> | null
   /** 添加/导入时直接绑定的账号分组；命中已存在账号时不改其分组。 */
@@ -1099,6 +1103,7 @@ export interface AddATAccountRequest {
   name?: string
   access_token: string
   proxy_url: string
+  timezone?: string
   allow_duplicate?: boolean
   custom_headers?: Record<string, string> | null
   /** 添加/导入时直接绑定的账号分组；命中已存在账号时不改其分组。 */
@@ -1110,6 +1115,7 @@ export interface ImportAgentIdentityRequest {
   name?: string
   auth_json: string
   proxy_url?: string
+  timezone?: string
 }
 
 export interface ImportAgentIdentityResponse {
@@ -1122,6 +1128,7 @@ export interface ImportAgentIdentityResponse {
 export interface AgentIdentityBatchImportRequest {
   files: string[]
   proxy_url?: string
+  timezone?: string
 }
 
 export interface AgentIdentityImportItem {
@@ -2239,6 +2246,7 @@ export interface SystemSettings {
   test_model: string
   test_content: string
   test_concurrency: number
+  background_quiet_hours: { start: string; end: string }[]
   background_refresh_interval_minutes: number
 	  usage_probe_max_age_minutes: number
 	  usage_probe_concurrency: number

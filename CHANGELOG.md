@@ -1,5 +1,65 @@
 # Changelog
 
+## v3.1.9 - 2026-11-22
+
+### Features
+
+- **Antigravity exposes reasoning tiers for Gemini 4 Neon, Carbon and Hydrogen (#902, @wangbingnan136).** The model list and Codex manifest group tiers under each family's name. Requests select the matching upstream model and send its thinking level. All three default to `high` when available, and Neon and Hydrogen also support `xhigh`.
+
+- **Antigravity accounts support per-account scheduling and per-family quota pauses (#912, @wangbingnan136).** Administrators can configure concurrency, priority, request-count limits and allowed API keys in the account editor. Reaching a 5-hour or weekly threshold pauses the affected model family until its trusted reset. The account list shows live concurrency, request counts and cooldowns.
+
+- **Administrators can schedule daily quiet hours for background inspections (#909, @Alexander4731).** Up to 32 periods in UTC+8 can span midnight or overlap. Saving a schedule takes effect immediately for automatic refreshes, probes and scheduled connection tests. Manual actions and model requests remain available.
+
+- **Codex account headers can follow the synchronized CLI version (#908, @Alexander4731).** Official Codex accounts can use `{{codex_cli_version}}` in custom `User-Agent` and `Version` headers. HTTP requests, maintenance requests and new WebSocket handshakes expand the template at send time.
+
+- **Isolated Codex IDs can preserve the source UUIDv7 creation time (#911, @Alexander4731).** An optional, fixed `CODEX_IDENTITY_V2_FROM_UNIX_MS` cutoff applies to single-machine multi-window identities and explicit session-derived cache IDs. Older IDs and opaque inputs keep their existing mappings. See the [activation and rollback instructions](docs/codex-identity-time.md).
+
+### Fixes
+
+- **Renaming an API key keeps its usage in one row (#903, @Blaskyy).** Usage statistics and token rankings group records by key ID and display the current name. Deleted keys use their latest available log label, and historical records without an ID retain their snapshot labels.
+
+- **Codex Responses preserves the requested reasoning-summary delivery mode (#905, reported by @mice33, #906, @koeria).** Request preparation forwards a nonempty `stream_options.reasoning_summary_delivery`, including `sequential_cutoff`. Strict compatibility accepts the string field and rejects unsupported sibling options and non-string values.
+
+- **The Codex Desktop identity preview shows the correct target platform (#907, @Alexander4731).** The preview reads the operating system and architecture from the User-Agent's platform segment. Regression tests cover Windows x64 and macOS arm64 and check the displayed CLI version source.
+
+- **Codex Responses country-field behavior is documented and covered by regression tests (#904, requested by @mice33).** Tests cover an omitted `request_country`, explicit `null` and a country code over HTTP and across successive WebSocket frames. The configuration guide shows how to supply a default for requests that omit the field.
+
+## v3.1.8 - 2026-11-20
+
+### Fixes
+
+- **Account usage totals follow each account's official quota resets (#798, reported by @orangestar0829, #896, @koeria).** The account list and detail page now count requests, tokens and costs from the start of the current quota window, including monthly windows where applicable. When a reset time is unavailable, that window still uses the rolling 5-hour or 7-day total.
+
+- **Automatic quota pauses show the window and reset time that triggered them (#897, reported by @MagnetOscar, #898, @koeria).** The account page uses the scheduler's effective threshold, including thresholds inherited from a group or global settings. When both thresholds are reached, the page shows the 7-day reset. Live updates clear the pause indicator after recovery.
+
+- **Codex preserve mode keeps recognized client User-Agents on HTTP and WebSocket requests (#899, reported by @mice33, #900, @koeria).** Device-profile stabilization could replace a Windows Codex Desktop identity with the default macOS CLI profile. Preserve mode now forwards a recognized official User-Agent with a parseable version. Explicit User-Agent overrides retain precedence.
+
+- **Account mode names are fully visible in the management menu (#901, reported by @MagnetOscar).** Pool Mode and Personal Mode have distinct icons and room for the selection checkmark. The trigger stays compact, and the header controls wrap on narrow screens.
+
+## v3.1.7 - 2026-11-18
+
+### Features
+
+- **Kiro accounts can serve Messages, Responses and Chat Completions over HTTP (#840, #884, #886, #888, #893, @wangbingnan136).** Administrators can sign in or import credentials, manage accounts and groups, and sync credits and model catalogs. The gateway recognizes Max and Student plans, refreshes the Student catalog with the current IDE version, and pauses accounts with exhausted credits until the upstream allowance recovers. The protocol adapter is based on `kiro.rs`.
+
+- **The built-in Codex catalog includes GPT-6.2 Astra and Sol (#895, @mianfeikejiwl).** Adds model metadata and pricing for cached tokens, long contexts and Ultrafast requests. Historical usage uses each record's timestamp to select the applicable Ultrafast multiplier. The built-in Codex CLI version and default minimum are now `0.170.0`.
+
+- **Codex accounts can bind a timezone before their first request (#890, requested by @skybbk1001).** Token entry, OAuth, Session JSON, Agent Identity and batch imports accept an optional IANA timezone. The first database record and runtime account use the selected value. Reimports and reauthorization preserve an existing account's binding.
+
+- **Codex official-format request compatibility is configurable (#891, @Alexander4731).** Optional settings control per-account installation IDs, generated attestation and preservation of message IDs and metadata on qualifying Responses requests. The settings apply to HTTP and WebSocket requests and are disabled by default.
+
+- **API Key holders have a dedicated account-usage tab (#879, @Blaskyy).** The portal separates account usage from the key's own quota and uses the same plan badges and usage bars as the admin page. Per-key permissions save across edit tabs. Reset requests retain authorization, idempotency, workspace leases and cooldowns. The manual uncertain-reset clearing endpoint and response field have been removed.
+
+### Fixes
+
+- **Chat Completions preserves the developer role in Codex Responses (#889, reported by @mice33, #892, @koeria).** Developer messages previously became user messages during translation. Both plain-text and multipart messages retain their role, content and position.
+
+- **Image usage statistics show the model reported by the upstream (#882, reported by @MagnetOscar, #887, @koeria).** Streaming and non-streaming requests record the upstream model alongside the requested model. When there is no local mapping, a reported image model can supply the effective model used for aggregation.
+
+- **Antigravity handles OpenMausBot and OpenCode client text more consistently (#883, #885, @frank8ai).** Normalization recognizes additional client preambles and OpenMausBot notices across message and tool content. Regression coverage includes Markdown code spans and fenced blocks.
+
+- **Frontend builds guard against the picomatch ReDoS advisory (GHSA-fc5q-39xc-vjpf).** A checksum-verified patch protects the pinned build dependency when it compiles repeated wildcard patterns. Tailwind's build tools are development dependencies, and production dependency audits no longer need an exception for this advisory.
+
 ## v3.1.6 - 2026-11-14
 
 ### Features
